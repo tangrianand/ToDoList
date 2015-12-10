@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/ToDoList.iml" filepath="$PROJECT_DIR$/ToDoList.iml" />
+      <module fileurl="file://$PROJECT_DIR$/apache-httpcomponents-httpclient/apache-httpcomponents-httpclient.iml" filepath="$PROJECT_DIR$/apache-httpcomponents-httpclient/apache-httpcomponents-httpclient.iml" />
+      <module fileurl="file://$PROJECT_DIR$/apache-httpcomponents-httpclient/apache-httpcomponents-httpclient.iml" filepath="$PROJECT_DIR$/apache-httpcomponents-httpclient/apache-httpcomponents-httpclient.iml" />
+      <module fileurl="file://$PROJECT_DIR$/apache-httpcomponents-httpcore/apache-httpcomponents-httpcore.iml" filepath="$PROJECT_DIR$/apache-httpcomponents-httpcore/apache-httpcomponents-httpcore.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/java-json/java-json.iml" filepath="$PROJECT_DIR$/java-json/java-json.iml" />
+    </modules>
+  </component>
+</project>
