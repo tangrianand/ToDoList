@@ -3,11 +3,13 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:fitsSystemWindows="true"
+    android:background="@color/orange"
     >
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/orange">
 
     <TextView
         android:id="@+id/status"
@@ -25,6 +27,9 @@
             style="@style/Theme.AppCompat.Light.Dialog"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="24dp"
+            android:padding="12dp"
             android:text="Email:"
             />
     <TextView
@@ -32,6 +37,9 @@
         style="@style/Theme.AppCompat.Light.Dialog"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:layout_marginBottom="24dp"
+        android:padding="12dp"
         android:text=""
         />
 
@@ -42,7 +50,7 @@
 
 
 
-    <Button
+    <!--Button
         style="@style/Base.V22.Theme.AppCompat"
         android:id="@+id/btn_continue"
         android:layout_width="fill_parent"
@@ -60,7 +68,7 @@
         android:layout_marginTop="24dp"
         android:layout_marginBottom="24dp"
         android:padding="12dp"
-        android:text="Signout"/>
+        android:text="Signout"/-->
 
     <android.support.v7.widget.AppCompatButton
         android:id="@+id/btn_signin"
@@ -70,6 +78,34 @@
         android:layout_marginBottom="24dp"
         android:padding="12dp"
         android:text="Sign In"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/orange">
+        <Button
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="24dp"
+            android:padding="12dp"
+            android:text="Sign out"
+            android:id="@+id/btn_signout"
+            />
+        <Button
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="24dp"
+            android:padding="12dp"
+            android:layout_height="wrap_content"
+            android:text="Continue"
+            android:id="@+id/btn_continue"
+            />
+
+    </LinearLayout>
 
 </LinearLayout>
     </ScrollView>

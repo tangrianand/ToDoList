@@ -1,15 +1,10 @@
 package com.example.anand.todolist;
-
-
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.location.Location;
-import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -24,12 +19,10 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
-
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -43,14 +36,12 @@ public class DoList extends AppCompatActivity {
     private TextView time;
     private Calendar calendar;
     private String format = "";
-    private DatePicker datePicker;
     private TextView dateView;
     private int year, month, day;
-    private TextView rem,loc,da,ti;
-    StringBuilder a;
+    private TextView rem,da;
+    private StringBuilder a;
     private ProgressDialog pDialog;
     JSONParser jParser1 = new JSONParser();
-
     AppLocationService appLocationService;
 
     @Override
@@ -74,24 +65,6 @@ public class DoList extends AppCompatActivity {
         rem = (EditText) findViewById(R.id.Textarea);
         da = (TextView) findViewById(R.id.viewdate);
 
-
-
-        btndate = (Button) findViewById(R.id.btn_date);
-
-        btndate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View arg0) {
-                year = calendar.get(Calendar.YEAR);
-
-                month = calendar.get(Calendar.MONTH);
-                day = calendar.get(Calendar.DAY_OF_MONTH);
-
-                setDate(arg0);
-
-            }
-        });
-
-
         final Test mGPS = new Test(this);
         if (!mGPS.isGPSEnabled || !mGPS.isNetworkEnabled) {
             showSettingsAlert();
@@ -99,13 +72,11 @@ public class DoList extends AppCompatActivity {
             textView.setText("Latitude: " + mGPS.getLatitude() + " " + "Longitude: " + mGPS.getLongitude());
         }
 
-
         if (mGPS.canGetLocation) {
             mGPS.getLocation();
             textView.setText("Latitude: " + mGPS.getLatitude() + " " + "Longitude: " + mGPS.getLongitude());
 
         }
-
 
         if (mGPS.canGetLocation) {
             double latitude = mGPS.getLatitude();
@@ -113,9 +84,22 @@ public class DoList extends AppCompatActivity {
             LocationAddress locationAddress = new LocationAddress();
             locationAddress.getAddressFromLocation(latitude, longitude,
                     getApplicationContext(), new GeocoderHandler());
-        } else if (mGPS.isGPSEnabled && mGPS.isNetworkEnabled) {
+        }
+        else if (mGPS.isGPSEnabled && mGPS.isNetworkEnabled) {
             Toast.makeText(DoList.this, "Waiting For GPS!", Toast.LENGTH_SHORT).show();
         }
+
+        btndate = (Button) findViewById(R.id.btn_date);
+
+        btndate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+                year = calendar.get(Calendar.YEAR);
+                month = calendar.get(Calendar.MONTH);
+                day = calendar.get(Calendar.DAY_OF_MONTH);
+                setDate(arg0);
+            }
+        });
 
 
         btnGPSShowLocation = (Button) findViewById(R.id.btnGPSShowLocation);
@@ -127,25 +111,29 @@ public class DoList extends AppCompatActivity {
                     showSettingsAlert();
                     mGPS.getLocation();
                     textView.setText("Latitude: " + mGPS.getLatitude() + " " + "Longitude: " + mGPS.getLongitude());
-                } else if (mGPS.isGPSEnabled && mGPS.isNetworkEnabled) {
+                }
+                else if (mGPS.isGPSEnabled && mGPS.isNetworkEnabled) {
                     Toast.makeText(DoList.this, "Waiting For GPS!", Toast.LENGTH_SHORT).show();
                 }
-
 
                 if (mGPS.canGetLocation) {
                     mGPS.getLocation();
                     textView.setText("Latitude: " + mGPS.getLatitude() + " " + "Longitude: " + mGPS.getLongitude());
-
                 }
-
             }
-
-
         });
+
         btnShowAddress = (Button) findViewById(R.id.btnShowAddress);
+
         btnShowAddress.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
+                if (!mGPS.isGPSEnabled || !mGPS.isNetworkEnabled) {
+                    showSettingsAlert();
+                    mGPS.getLocation();
+                    textView.setText("Latitude: " + mGPS.getLatitude() + " " + "Longitude: " + mGPS.getLongitude());
+                }
+                
                 if (mGPS.isGPSEnabled && mGPS.isNetworkEnabled) {
                     Toast.makeText(DoList.this, "Waiting For GPS!", Toast.LENGTH_SHORT).show();
                 }
@@ -156,15 +144,15 @@ public class DoList extends AppCompatActivity {
                     LocationAddress locationAddress = new LocationAddress();
                     locationAddress.getAddressFromLocation(latitude, longitude,
                             getApplicationContext(), new GeocoderHandler());
-                } else {
+                }
+                else {
                     Toast.makeText(DoList.this, "Waiting For GPS!", Toast.LENGTH_SHORT).show();
                 }
-
-
             }
         });
 
         bsubmit = (Button) findViewById(R.id.btn_submit);
+
         bsubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
@@ -179,7 +167,7 @@ public class DoList extends AppCompatActivity {
     public void setTime(View view) {
         int hour = timePicker1.getCurrentHour();
         int min = timePicker1.getCurrentMinute();
-       showTime(hour,min);
+        showTime(hour,min);
 
     }
     public void showTime(int hour, int min) {
@@ -229,12 +217,12 @@ public class DoList extends AppCompatActivity {
     }
 
 
-    public void showSettingsAlert() {
+    public void showSettingsAlert() {              //if gps is not enabled
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(
                 DoList.this);
         alertDialog.setTitle("SETTINGS");
-        alertDialog.setMessage("Enable Location Provider! Go to settings menu?");
-        alertDialog.setPositiveButton("Settings",
+        alertDialog.setMessage("Enable Location Provider! Go to settings Location Services?");
+        alertDialog.setPositiveButton("Location Settings",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         Intent intent = new Intent(
@@ -251,7 +239,7 @@ public class DoList extends AppCompatActivity {
         alertDialog.show();
     }
 
-    private class GeocoderHandler extends Handler {
+    private class GeocoderHandler extends Handler {     //to convert location to address
         @Override
         public void handleMessage(Message message) {
             String locationAddress;
@@ -267,16 +255,12 @@ public class DoList extends AppCompatActivity {
         }
     }
 
-    class Submit extends AsyncTask<String, String, String> {
+    class Submit extends AsyncTask<String, String, String> {  //inner class to enter details in database
 
-
-        String reminder = rem.getText().toString().trim();
+        String remind = rem.getText().toString().trim();
         String location = tvAddress.getText().toString().trim();
         String dat = da.getText().toString().trim();
         String time = a.toString().trim();
-
-
-
 
         protected void onPreExecute() {
             super.onPreExecute();
@@ -289,71 +273,59 @@ public class DoList extends AppCompatActivity {
 
         protected String doInBackground(String... args) {
             int success;
-
             try {
                 List<NameValuePair> params = new ArrayList<NameValuePair>();
-                params.add(new BasicNameValuePair("reminder", reminder));
+                params.add(new BasicNameValuePair("remind", remind));
                 params.add(new BasicNameValuePair("location", location));
                 params.add(new BasicNameValuePair("dat", dat));
                 params.add(new BasicNameValuePair("time", time));
-                Log.d("chutiya", time + reminder + location + dat);
-
+                Log.d("dry", time + remind + location + dat);
                 Log.d("request!", "starting");
 
-                JSONObject json1 = jParser1.makeHttpRequest("http://c06d9af0.ngrok.io/android/abc.php", "POST", params);
+                JSONObject json1 = jParser1.makeHttpRequest("http://c06d9af0.ngrok.io/android/createdolist.php", "POST", params);
                 Log.d("Submit attempt", json1.toString());
-
-
                 success = json1.optInt("success");
-
-
 
                 if (success == 1) {
                     Log.d("Successful Submmission", json1.toString());
                     return json1.getString("message");
 
-
-
-                } else {
+                }
+                else {
                     Log.d("No submission", json1.toString());
                     return json1.getString("message");
-
                 }
 
 
             }
             catch(JSONException e){
                 e.printStackTrace();
-
-
             }
-
-
-
             return null;
-
         }
 
         protected void onPostExecute(String message){
             try {
-
-
                 pDialog.dismiss();
-
-
                 if (message != null) {
                     Toast.makeText(DoList.this, message, Toast.LENGTH_LONG).show();
                 }
-               /* if(message.equals("Successful login")) {
-                    Intent intent = new Intent(LoginActivity.this, DoList.class);
-                    startActivity(intent);
-                    finish();
-                }*/
+                if(message.equals("Successfully entered")) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(DoList.this);
+                    builder.setCancelable(true);
+                    builder.setTitle(remind);
+                    builder.setMessage("Location: " + location + "\n\n" + "Date: " + dat + "\n\n" + "Time: " + time);
+                    builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                        }
+                    });
+                    builder.show();
+                }
             }
             catch (final IllegalArgumentException e) {
-                // Handle or log or ignore
+                e.printStackTrace();
             } catch (final Exception e) {
-                // Handle or log or ignore
+                e.printStackTrace();
             }
         }
     }

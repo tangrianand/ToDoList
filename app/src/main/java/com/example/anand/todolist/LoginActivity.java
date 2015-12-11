@@ -10,6 +10,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -20,7 +21,8 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.net.UnknownHostException;
+import com.google.android.gms.common.SignInButton;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,7 +34,8 @@ public class LoginActivity extends Activity implements View.OnClickListener {
 
     private ProgressDialog pDialog;
     TextView user, pass;
-    Button blogin,bgoogle;
+    Button blogin;
+    SignInButton bgoogle;
     JSONParser jParser = new JSONParser();
    // private static String url = "http://localhost/android/login.php";
     private static final String TAG_SUCCESS = "success";
@@ -43,12 +46,13 @@ public class LoginActivity extends Activity implements View.OnClickListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.loginactivity);
 
         blogin = (Button) findViewById(R.id.btn_login);
-        bgoogle = (Button) findViewById(R.id.btn_google);
+        bgoogle = (SignInButton) findViewById(R.id.btn_google);
         user = (TextView) findViewById(R.id.input_email);
         pass = (TextView) findViewById(R.id.input_password);
+        blogin.setBackgroundColor(Color.WHITE);
         blogin.setOnClickListener(this);
         bgoogle.setOnClickListener(this);
     }
@@ -141,7 +145,7 @@ public class LoginActivity extends Activity implements View.OnClickListener {
         protected void onPreExecute() {
             super.onPreExecute();
             pDialog = new ProgressDialog(LoginActivity.this);
-            pDialog.setMessage("Attempting for login...");
+            pDialog.setMessage("Attempting to login...");
             pDialog.setIndeterminate(false);
             pDialog.setCancelable(true);
             pDialog.show();
