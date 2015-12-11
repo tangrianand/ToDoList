@@ -50,6 +50,7 @@ public class SigninActivity extends AppCompatActivity implements View.OnClickLis
         setContentView(R.layout.signin);
         mStatusTextView = (TextView) findViewById(R.id.status);
         mview = (TextView) findViewById(R.id.email);
+        getSupportActionBar().setTitle("Google Profile");
 
         findViewById(R.id.btn_signout).setOnClickListener(this);
         findViewById(R.id.btn_signin).setOnClickListener(this);
@@ -65,6 +66,8 @@ public class SigninActivity extends AppCompatActivity implements View.OnClickLis
         signIn();
 
     }
+
+
 
     @Override
     public void onStart() {
@@ -108,6 +111,7 @@ public class SigninActivity extends AppCompatActivity implements View.OnClickLis
 
             mStatusTextView.setText(getString(R.string.signedin, acct.getDisplayName()));
             mview.setText(getString(R.string.mail, acct.getEmail()));
+           
             updateUI(true);
         } else {
             // Signed out, show unauthenticated UI.
@@ -187,10 +191,12 @@ public class SigninActivity extends AppCompatActivity implements View.OnClickLis
         if (signedIn) {
             findViewById(R.id.btn_signin).setVisibility(View.GONE);
             findViewById(R.id.btn_signout).setVisibility(View.VISIBLE);
+            findViewById(R.id.btn_continue).setVisibility(View.VISIBLE);
         } else {
             mStatusTextView.setText("");
 
-            findViewById(R.id.btn_signin).setVisibility(View.VISIBLE);
+            findViewById(R.id.btn_continue).setVisibility(View.GONE);
+            findViewById(R.id.btn_signin).setVisibility(View.GONE);
             findViewById(R.id.btn_signout).setVisibility(View.GONE);
         }
     }
@@ -206,7 +212,7 @@ public class SigninActivity extends AppCompatActivity implements View.OnClickLis
                 signOut();
                 break;
             case R.id.btn_continue:
-                Intent intent=new Intent(SigninActivity.this, ShowPlace.class);
+                Intent intent=new Intent(SigninActivity.this, DoList.class);
                 startActivity(intent);
                 finish();
                 break;

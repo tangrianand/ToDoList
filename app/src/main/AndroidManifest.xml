@@ -31,6 +31,8 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_api_key" />
 
+
+
         <activity
             android:name=".LoginActivity"
             android:label="@string/app_name"
@@ -49,7 +51,7 @@
 
         </activity>
         <activity
-            android:name=".ShowPlace"
+            android:name=".DoList"
             android:parentActivityName="com.example.anand.todolist.SigninActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

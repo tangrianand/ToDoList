@@ -32,8 +32,7 @@ public class AppLocationService extends Service implements LocationListener {
                 }
             }
         }
-        try{gps_enabled=locManager.isProviderEnabled(LocationManager.GPS_PROVIDER);}catch(Exception ex){}
-        try{network_enabled=locManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);}catch(Exception ex){}
+
         catch(SecurityException e)
         {e.printStackTrace();}
         return null;
@@ -61,47 +60,3 @@ public class AppLocationService extends Service implements LocationListener {
     }
 
 }
-
-    void getMyCurrentLocation() {
-
-        LocationManager locManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        LocationListener locListener = new MyLocationListener();
-        try{gps_enabled=locManager.isProviderEnabled(LocationManager.GPS_PROVIDER);}catch(Exception ex){}
-        try{network_enabled=locManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);}catch(Exception ex){}
-        //don't start listeners if no provider is enabled
-
-        //if(!gps_enabled && !network_enabled)
-
-        //return false;
-
-        if(gps_enabled){
-            locManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locListener);
-
-        }
-
-
-        if(gps_enabled){
-            location=locManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-
-        }
-
-        if(network_enabled && location==null){
-
-            locManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locListener);
-
-        }
-        if(network_enabled && location==null)    {
-            location=locManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-
-        }
-
-        if (location != null) {
-
-            MyLat = location.getLatitude();
-            MyLong = location.getLongitude();
-        } else {
-            Location loc= getLastKnownLocation(this);
-            if (loc != null) {
-                MyLat = loc.getLatitude();
-                MyLong = loc.getLongitude();
-            }
