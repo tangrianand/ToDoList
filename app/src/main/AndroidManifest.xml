@@ -43,21 +43,25 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".SigninActivity"/>
+        <activity
+            android:name=".DoList"/>
+        <!--activity
             android:name=".SigninActivity"
             android:parentActivityName="com.example.anand.todolist.LoginActivity" >
         <meta-data
             android:name="android.support.PARENT_ACTIVITY"
             android:value="com.example.anand.todolist.LoginActivity" />
 
-        </activity>
-        <activity
+        </activity-->
+        <!--activity
             android:name=".DoList"
             android:parentActivityName="com.example.anand.todolist.SigninActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.anand.todolist.SigninActivity" />
 
-        </activity>
+        </activity-->
 
    </application>
 

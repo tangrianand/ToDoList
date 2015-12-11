@@ -1,11 +1,9 @@
 package com.example.anand.todolist;
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.content.IntentSender;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+
 import android.net.Uri;
-import android.os.AsyncTask;
+
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
@@ -111,7 +109,7 @@ public class SigninActivity extends AppCompatActivity implements View.OnClickLis
 
             mStatusTextView.setText(getString(R.string.signedin, acct.getDisplayName()));
             mview.setText(getString(R.string.mail, acct.getEmail()));
-           
+
             updateUI(true);
         } else {
             // Signed out, show unauthenticated UI.
@@ -138,7 +136,7 @@ public class SigninActivity extends AppCompatActivity implements View.OnClickLis
                     }
                 });
         Toast.makeText(this, "Successfully Signed out!", Toast.LENGTH_SHORT).show();
-        NavUtils.navigateUpFromSameTask(this);
+
     }
 
     @Override

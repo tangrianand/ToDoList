@@ -1,4 +1,5 @@
 package com.example.anand.todolist;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 
 import org.apache.http.NameValuePair;
@@ -6,7 +7,11 @@ import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONException;
 import org.json.JSONObject;
 import android.app.Activity;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -15,6 +20,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,7 +28,7 @@ import java.util.List;
 /**
  * Created by Anand on 08-12-2015.
  */
-public class LoginActivity extends Activity implements View.OnClickListener{
+public class LoginActivity extends Activity implements View.OnClickListener {
 
     private ProgressDialog pDialog;
     TextView user, pass;
@@ -31,6 +37,7 @@ public class LoginActivity extends Activity implements View.OnClickListener{
    // private static String url = "http://localhost/android/login.php";
     private static final String TAG_SUCCESS = "success";
     private static final String TAG_MESSAGE = "message";
+
 
 
     @Override
@@ -49,18 +56,75 @@ public class LoginActivity extends Activity implements View.OnClickListener{
 
             public void onClick(View view) {
                 switch (view.getId()) {
-                    case R.id.btn_login:
-                        new AttemptLogin().execute();
-                    case R.id.btn_google:
+                    case R.id.btn_login:{
+                        if(!haveNetworkConnection())
+                        {
+                            AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+
+                            alertDialog.setTitle("Info");
+                            alertDialog.setMessage("Internet not available, Cross check your internet connectivity and try again");
+                            alertDialog.setIcon(android.R.drawable.ic_dialog_alert);
+
+                            alertDialog.setButton("OK", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    System.exit(1);
+                                }
+                            });
+
+                            alertDialog.show();
+                        }
+                        else
+                        new AttemptLogin().execute();}
+
+                        break;
+
+                    case R.id.btn_google:{
+                        if(!haveNetworkConnection())
+                        {
+                            AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+
+                            alertDialog.setTitle("Info");
+                            alertDialog.setMessage("Internet not available, Cross check your internet connectivity and try again");
+                            alertDialog.setIcon(android.R.drawable.ic_dialog_alert);
+
+                            alertDialog.setButton("OK", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    System.exit(1);
+                                }
+                            });
+
+                            alertDialog.show();
+                        }
+                        else{
                         Log.d("google!", "starting");
-                       Intent intent=new Intent(LoginActivity.this, SigninActivity.class);
-                        startActivity(intent);
-                        finish();
+
+                       Intent i=new Intent(LoginActivity.this, SigninActivity.class);
+                        startActivity(i);
+                        finish();}
+                        break;}
                     default:
                        break;
                 }
 
             }
+
+  private boolean haveNetworkConnection() {
+      boolean haveConnectedWifi = false;
+      boolean haveConnectedMobile = false;
+
+      ConnectivityManager cm = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+
+      NetworkInfo[] netInfo = cm.getAllNetworkInfo();
+      for (NetworkInfo ni : netInfo) {
+          if (ni.getTypeName().equalsIgnoreCase("WIFI"))
+              if (ni.isConnected())
+                  haveConnectedWifi = true;
+          if (ni.getTypeName().equalsIgnoreCase("MOBILE"))
+              if (ni.isConnected())
+                  haveConnectedMobile = true;
+      }
+      return haveConnectedWifi || haveConnectedMobile;
+  }
 
 
 
@@ -93,8 +157,8 @@ public class LoginActivity extends Activity implements View.OnClickListener{
 
                 Log.d("request!", "starting");
 
-                JSONObject json = jParser.makeHttpRequest("http://192.168.236.1/android/login.php", "POST", params);
-               Log.d("Login attempt", json.toString());
+                JSONObject json = jParser.makeHttpRequest("http://c06d9af0.ngrok.io/android/login.php", "POST", params);
+                Log.d("Login attempt", json.toString());
 
 
                 success = json.optInt(TAG_SUCCESS);
@@ -104,24 +168,49 @@ public class LoginActivity extends Activity implements View.OnClickListener{
                     if (success == 1) {
                         Log.d("Successful Login", json.toString());
                         return json.getString(TAG_MESSAGE);
+
+
+
                     } else {
                         Log.d("unSuccessful Login", json.toString());
                         return json.getString(TAG_MESSAGE);
+
                     }
 
 
             }
             catch(JSONException e){
                 e.printStackTrace();
+                Toast.makeText(LoginActivity.this, "ngrok is not online", Toast.LENGTH_LONG).show();
+
             }
+
+
+
             return null;
 
         }
 
         protected void onPostExecute(String message){
-            pDialog.dismiss();
-            if(message!=null){
-                Toast.makeText(LoginActivity.this, message, Toast.LENGTH_LONG).show();
+            try {
+
+
+                pDialog.dismiss();
+
+
+                if (message != null) {
+                    Toast.makeText(LoginActivity.this, message, Toast.LENGTH_LONG).show();
+                }
+                if(message.equals("Successful login")) {
+                    Intent intent = new Intent(LoginActivity.this, DoList.class);
+                    startActivity(intent);
+                    finish();
+                }
+            }
+            catch (final IllegalArgumentException e) {
+                // Handle or log or ignore
+            } catch (final Exception e) {
+                // Handle or log or ignore
             }
         }
     }

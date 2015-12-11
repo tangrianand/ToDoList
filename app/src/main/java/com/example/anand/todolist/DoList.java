@@ -5,28 +5,39 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 public class DoList extends AppCompatActivity {
 
     Button btnGPSShowLocation;
-    Button btnShowAddress,btndate;
+    Button btnShowAddress,btndate,bsubmit;
     TextView tvAddress,textView;
     private TimePicker timePicker1;
     private TextView time;
@@ -35,6 +46,10 @@ public class DoList extends AppCompatActivity {
     private DatePicker datePicker;
     private TextView dateView;
     private int year, month, day;
+    private TextView rem,loc,da,ti;
+    StringBuilder a;
+    private ProgressDialog pDialog;
+    JSONParser jParser1 = new JSONParser();
 
     AppLocationService appLocationService;
 
@@ -49,12 +64,16 @@ public class DoList extends AppCompatActivity {
         time = (TextView) findViewById(R.id.time);
         dateView = (TextView) findViewById(R.id.viewdate);
         calendar = Calendar.getInstance();
-        int hour = calendar.get(Calendar.HOUR_OF_DAY);
-        int min = calendar.get(Calendar.MINUTE);
+        final  int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        final int min = calendar.get(Calendar.MINUTE);
         year = calendar.get(Calendar.YEAR);
         month = calendar.get(Calendar.MONTH);
         day = calendar.get(Calendar.DAY_OF_MONTH);
-        showDate(year,month+1,day);
+        showDate(year, month + 1, day);
+
+        rem = (EditText) findViewById(R.id.Textarea);
+        da = (TextView) findViewById(R.id.viewdate);
+
 
 
         btndate = (Button) findViewById(R.id.btn_date);
@@ -73,28 +92,29 @@ public class DoList extends AppCompatActivity {
         });
 
 
-       final Test mGPS = new Test(this);
+        final Test mGPS = new Test(this);
+        if (!mGPS.isGPSEnabled || !mGPS.isNetworkEnabled) {
+            showSettingsAlert();
+            mGPS.getLocation();
+            textView.setText("Latitude: " + mGPS.getLatitude() + " " + "Longitude: " + mGPS.getLongitude());
+        }
+
+
         if (mGPS.canGetLocation) {
             mGPS.getLocation();
-            textView.setText("Latitude: " + mGPS.getLatitude() +" "+ "Longitude: " + mGPS.getLongitude());
+            textView.setText("Latitude: " + mGPS.getLatitude() + " " + "Longitude: " + mGPS.getLongitude());
 
         }
-        else {
-            showSettingsAlert();
-        }
 
 
-        Location location = appLocationService
-                .getLocation(LocationManager.GPS_PROVIDER);
-
-        if (location != null) {
+        if (mGPS.canGetLocation) {
             double latitude = mGPS.getLatitude();
             double longitude = mGPS.getLongitude();
             LocationAddress locationAddress = new LocationAddress();
             locationAddress.getAddressFromLocation(latitude, longitude,
                     getApplicationContext(), new GeocoderHandler());
-        } else {
-            showSettingsAlert();
+        } else if (mGPS.isGPSEnabled && mGPS.isNetworkEnabled) {
+            Toast.makeText(DoList.this, "Waiting For GPS!", Toast.LENGTH_SHORT).show();
         }
 
 
@@ -103,41 +123,59 @@ public class DoList extends AppCompatActivity {
         btnGPSShowLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
+                if (!mGPS.isGPSEnabled || !mGPS.isNetworkEnabled) {
+                    showSettingsAlert();
+                    mGPS.getLocation();
+                    textView.setText("Latitude: " + mGPS.getLatitude() + " " + "Longitude: " + mGPS.getLongitude());
+                } else if (mGPS.isGPSEnabled && mGPS.isNetworkEnabled) {
+                    Toast.makeText(DoList.this, "Waiting For GPS!", Toast.LENGTH_SHORT).show();
+                }
+
 
                 if (mGPS.canGetLocation) {
                     mGPS.getLocation();
-                    textView.setText("Latitude: " + mGPS.getLatitude() +" "+ "Longitude: " + mGPS.getLongitude());
+                    textView.setText("Latitude: " + mGPS.getLatitude() + " " + "Longitude: " + mGPS.getLongitude());
 
                 }
-                else {
-                    showSettingsAlert();
-                }
+
             }
 
 
-    });
-      btnShowAddress = (Button) findViewById(R.id.btnShowAddress);
+        });
+        btnShowAddress = (Button) findViewById(R.id.btnShowAddress);
         btnShowAddress.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
-                Location location = appLocationService
-                        .getLocation(LocationManager.GPS_PROVIDER);
+                if (mGPS.isGPSEnabled && mGPS.isNetworkEnabled) {
+                    Toast.makeText(DoList.this, "Waiting For GPS!", Toast.LENGTH_SHORT).show();
+                }
 
-                if (location != null) {
+                if (mGPS.canGetLocation) {
                     double latitude = mGPS.getLatitude();
                     double longitude = mGPS.getLongitude();
                     LocationAddress locationAddress = new LocationAddress();
                     locationAddress.getAddressFromLocation(latitude, longitude,
                             getApplicationContext(), new GeocoderHandler());
                 } else {
-                    showSettingsAlert();
+                    Toast.makeText(DoList.this, "Waiting For GPS!", Toast.LENGTH_SHORT).show();
                 }
 
 
             }
         });
 
+        bsubmit = (Button) findViewById(R.id.btn_submit);
+        bsubmit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+                setTime(arg0);
+                new Submit().execute();
+
+            }
+
+        });
     }
+
     public void setTime(View view) {
         int hour = timePicker1.getCurrentHour();
         int min = timePicker1.getCurrentMinute();
@@ -157,13 +195,12 @@ public class DoList extends AppCompatActivity {
         } else {
             format = "AM";
         }
-        //time.setText(new StringBuilder().append(hour).append(" : ").append(min).append(" ").append(format));
+        a= new StringBuilder().append(hour).append(" : ").append(min).append(" ").append(format);
     }
 
     @SuppressWarnings("deprecation")
     public void setDate(View view) {
         showDialog(999);
-        //Toast.makeText(getApplicationContext(), "ca", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -227,6 +264,97 @@ public class DoList extends AppCompatActivity {
                     locationAddress = null;
             }
             tvAddress.setText(locationAddress);
+        }
+    }
+
+    class Submit extends AsyncTask<String, String, String> {
+
+
+        String reminder = rem.getText().toString().trim();
+        String location = tvAddress.getText().toString().trim();
+        String dat = da.getText().toString().trim();
+        String time = a.toString().trim();
+
+
+
+
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pDialog = new ProgressDialog(DoList.this);
+            pDialog.setMessage("Submitting...");
+            pDialog.setIndeterminate(false);
+            pDialog.setCancelable(true);
+            pDialog.show();
+        }
+
+        protected String doInBackground(String... args) {
+            int success;
+
+            try {
+                List<NameValuePair> params = new ArrayList<NameValuePair>();
+                params.add(new BasicNameValuePair("reminder", reminder));
+                params.add(new BasicNameValuePair("location", location));
+                params.add(new BasicNameValuePair("dat", dat));
+                params.add(new BasicNameValuePair("time", time));
+                Log.d("chutiya", time + reminder + location + dat);
+
+                Log.d("request!", "starting");
+
+                JSONObject json1 = jParser1.makeHttpRequest("http://c06d9af0.ngrok.io/android/abc.php", "POST", params);
+                Log.d("Submit attempt", json1.toString());
+
+
+                success = json1.optInt("success");
+
+
+
+                if (success == 1) {
+                    Log.d("Successful Submmission", json1.toString());
+                    return json1.getString("message");
+
+
+
+                } else {
+                    Log.d("No submission", json1.toString());
+                    return json1.getString("message");
+
+                }
+
+
+            }
+            catch(JSONException e){
+                e.printStackTrace();
+
+
+            }
+
+
+
+            return null;
+
+        }
+
+        protected void onPostExecute(String message){
+            try {
+
+
+                pDialog.dismiss();
+
+
+                if (message != null) {
+                    Toast.makeText(DoList.this, message, Toast.LENGTH_LONG).show();
+                }
+               /* if(message.equals("Successful login")) {
+                    Intent intent = new Intent(LoginActivity.this, DoList.class);
+                    startActivity(intent);
+                    finish();
+                }*/
+            }
+            catch (final IllegalArgumentException e) {
+                // Handle or log or ignore
+            } catch (final Exception e) {
+                // Handle or log or ignore
+            }
         }
     }
 }
