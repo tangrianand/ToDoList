@@ -32,7 +32,6 @@ public class RegisterActivity extends Activity implements View.OnClickListener {
     TextView user, pass;
     Button bregister;
     JSONParser jParser = new JSONParser();
-    // private static String url = "http://localhost/android/login.php";
     private static final String TAG_SUCCESS = "success";
     private static final String TAG_MESSAGE = "message";
 
@@ -46,8 +45,32 @@ public class RegisterActivity extends Activity implements View.OnClickListener {
         pass = (TextView) findViewById(R.id.input_password);
         bregister.setOnClickListener(this);
     }
+
     public void onClick(View view) {
         new AttemptLogin().execute();
+    }
+    @Override
+    public void onBackPressed()
+    {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(RegisterActivity.this);
+        builder.setCancelable(true);
+        builder.setTitle("Permission");
+        builder.setMessage("Move to Login Screen?");
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+
+            }
+        });
+        builder.show();
+
     }
 
     class AttemptLogin extends AsyncTask<String, String, String> {
@@ -79,24 +102,18 @@ public class RegisterActivity extends Activity implements View.OnClickListener {
                 JSONObject json = jParser.makeHttpRequest("http://c06d9af0.ngrok.io/android/register.php", "POST", params);
                 Log.d("Register attempt", json.toString());
 
-
                 success = json.optInt(TAG_SUCCESS);
-
-
 
                 if (success == 1) {
                     Log.d("Successful Registration", json.toString());
                     return json.getString(TAG_MESSAGE);
 
-
-
-                } else {
+                }
+                else {
                     Log.d("unSuccessful Registration", json.toString());
                     return json.getString(TAG_MESSAGE);
 
                 }
-
-
             }
             catch(JSONException e){
                 e.printStackTrace();
@@ -106,11 +123,7 @@ public class RegisterActivity extends Activity implements View.OnClickListener {
 
         protected void onPostExecute(String message){
             try {
-
-
                 pDialog.dismiss();
-
-
                 if (message != null) {
                     Toast.makeText(RegisterActivity.this, message, Toast.LENGTH_LONG).show();
                 }
@@ -127,13 +140,12 @@ public class RegisterActivity extends Activity implements View.OnClickListener {
                         }
                     });
                     builder.show();
-
                 }
             }
             catch (final IllegalArgumentException e) {
-                // Handle or log or ignore
+                e.printStackTrace();
             } catch (final Exception e) {
-                // Handle or log or ignore
+                e.printStackTrace();
             }
         }
     }

@@ -32,15 +32,15 @@ import java.util.List;
 public class DoList extends AppCompatActivity {
 
     Button btnGPSShowLocation;
-    Button btnShowAddress,btndate,bsubmit;
-    TextView tvAddress,textView;
+    Button btnShowAddress, btndate, bsubmit;
+    TextView tvAddress, textView;
     private TimePicker timePicker1;
     private TextView time;
-    private Calendar calendar,Calendar_Object;
+    private Calendar calendar, Calendar_Object;
     private String format = "";
     private TextView dateView;
     private int year, month, day;
-    private TextView rem,da;
+    private TextView rem, da;
     private StringBuilder a;
     private ProgressDialog pDialog;
     JSONParser jParser1 = new JSONParser();
@@ -58,7 +58,7 @@ public class DoList extends AppCompatActivity {
         dateView = (TextView) findViewById(R.id.viewdate);
         calendar = Calendar.getInstance();
         Calendar_Object = Calendar.getInstance();
-        final  int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        final int hour = calendar.get(Calendar.HOUR_OF_DAY);
         final int min = calendar.get(Calendar.MINUTE);
         year = calendar.get(Calendar.YEAR);
         month = calendar.get(Calendar.MONTH);
@@ -87,8 +87,7 @@ public class DoList extends AppCompatActivity {
             LocationAddress locationAddress = new LocationAddress();
             locationAddress.getAddressFromLocation(latitude, longitude,
                     getApplicationContext(), new GeocoderHandler());
-        }
-        else if (mGPS.isGPSEnabled && mGPS.isNetworkEnabled) {
+        } else if (mGPS.isGPSEnabled && mGPS.isNetworkEnabled) {
             Toast.makeText(DoList.this, "Waiting For GPS!", Toast.LENGTH_SHORT).show();
         }
 
@@ -114,8 +113,7 @@ public class DoList extends AppCompatActivity {
                     showSettingsAlert();
                     mGPS.getLocation();
                     textView.setText("Latitude: " + mGPS.getLatitude() + " " + "Longitude: " + mGPS.getLongitude());
-                }
-                else if (mGPS.isGPSEnabled && mGPS.isNetworkEnabled) {
+                } else if (mGPS.isGPSEnabled && mGPS.isNetworkEnabled) {
                     Toast.makeText(DoList.this, "Waiting For GPS!", Toast.LENGTH_SHORT).show();
                 }
 
@@ -147,8 +145,7 @@ public class DoList extends AppCompatActivity {
                     LocationAddress locationAddress = new LocationAddress();
                     locationAddress.getAddressFromLocation(latitude, longitude,
                             getApplicationContext(), new GeocoderHandler());
-                }
-                else {
+                } else {
                     Toast.makeText(DoList.this, "Waiting For GPS!", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -167,28 +164,30 @@ public class DoList extends AppCompatActivity {
         });
     }
 
+
     public void setTime(View view) {
         int hour = timePicker1.getCurrentHour();
         int min = timePicker1.getCurrentMinute();
-        showTime(hour,min);
+        showTime(hour, min);
 
     }
+
     public void showTime(int hour, int min) {
-        if(min>=15){
-        Calendar_Object.set(Calendar.HOUR_OF_DAY, hour);
-        Calendar_Object.set(Calendar.MINUTE, min-15);   //Considering person will put the time more than 15 minutes from the current time
-        Calendar_Object.set(Calendar.SECOND, 0);}
-        else if (min <15){
-            Calendar_Object.set(Calendar.HOUR_OF_DAY, hour-1);
-            Calendar_Object.set(Calendar.MINUTE, 60-15+min);
-            Calendar_Object.set(Calendar.SECOND, 0);}
+        if (min >= 15) {
+            Calendar_Object.set(Calendar.HOUR_OF_DAY, hour);
+            Calendar_Object.set(Calendar.MINUTE, min - 15);   //Considering person will put the time more than 15 minutes from the current time
+            Calendar_Object.set(Calendar.SECOND, 0);
+        } else if (min < 15) {
+            Calendar_Object.set(Calendar.HOUR_OF_DAY, hour - 1);
+            Calendar_Object.set(Calendar.MINUTE, 60 - 15 + min);
+            Calendar_Object.set(Calendar.SECOND, 0);
+        }
 
 
         if (hour == 0) {
             hour += 12;
             format = "AM";
-        }
-        else if (hour == 12) {
+        } else if (hour == 12) {
             format = "PM";
         } else if (hour > 12) {
             hour -= 12;
@@ -196,7 +195,7 @@ public class DoList extends AppCompatActivity {
         } else {
             format = "AM";
         }
-        a= new StringBuilder().append(hour).append(" : ").append(min).append(" ").append(format);
+        a = new StringBuilder().append(hour).append(" : ").append(min).append(" ").append(format);
     }
 
     @SuppressWarnings("deprecation")
@@ -220,14 +219,14 @@ public class DoList extends AppCompatActivity {
             // arg1 = year
             // arg2 = month
             // arg3 = day
-            showDate(arg1, arg2+1, arg3);
+            showDate(arg1, arg2 + 1, arg3);
         }
     };
 
     private void showDate(int year, int month, int day) {
         dateView.setText(new StringBuilder().append(day).append("/")
                 .append(month).append("/").append(year));
-        Calendar_Object.set(Calendar.MONTH, month-1);
+        Calendar_Object.set(Calendar.MONTH, month - 1);
         Calendar_Object.set(Calendar.YEAR, year);
         Calendar_Object.set(Calendar.DAY_OF_MONTH, day);
     }
@@ -306,27 +305,25 @@ public class DoList extends AppCompatActivity {
                     Log.d("Successful Submmission", json1.toString());
                     return json1.getString("message");
 
-                }
-                else {
+                } else {
                     Log.d("No submission", json1.toString());
                     return json1.getString("message");
                 }
 
 
-            }
-            catch(JSONException e){
+            } catch (JSONException e) {
                 e.printStackTrace();
             }
             return null;
         }
 
-        protected void onPostExecute(String message){
+        protected void onPostExecute(String message) {
             try {
                 pDialog.dismiss();
                 if (message != null) {
                     Toast.makeText(DoList.this, message, Toast.LENGTH_LONG).show();
                 }
-                if(message.equals("Successfully entered")) {
+                if (message.equals("Successfully entered")) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(DoList.this);
                     builder.setCancelable(true);
                     builder.setTitle(remind);
@@ -337,8 +334,14 @@ public class DoList extends AppCompatActivity {
                     });
                     builder.show();
                     Intent myIntent = new Intent(DoList.this, AlarmReceiver.class);
-                    myIntent.putExtra("remind",remind);
-                    myIntent.putExtra("location",location);
+                    myIntent.putExtra("remind", remind);
+                    myIntent.putExtra("location", location);
+                    myIntent.putExtra("mon", Calendar_Object.get(Calendar.MONTH));
+                    myIntent.putExtra("yea", Calendar_Object.get(Calendar.YEAR));
+                    myIntent.putExtra("day", Calendar_Object.get(Calendar.DAY_OF_MONTH));
+                    myIntent.putExtra("hr", Calendar_Object.get(Calendar.HOUR_OF_DAY));
+                    myIntent.putExtra("min", Calendar_Object.get(Calendar.MINUTE));
+                    myIntent.putExtra("sec", Calendar_Object.get(Calendar.SECOND));
 
 
                     PendingIntent pendingIntent = PendingIntent.getBroadcast(DoList.this,
@@ -357,12 +360,32 @@ public class DoList extends AppCompatActivity {
                             pendingIntent);
 
                 }
-            }
-            catch (final IllegalArgumentException e) {
+            } catch (final IllegalArgumentException e) {
                 e.printStackTrace();
             } catch (final Exception e) {
                 e.printStackTrace();
             }
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(DoList.this);
+        builder.setCancelable(true);
+        builder.setTitle("Permission");
+        builder.setMessage("Sure to exit?");
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                finish();
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+
+            }
+        });
+        builder.show();
+
     }
 }

@@ -45,26 +45,13 @@
         </activity>
         <activity
             android:name=".RegisterActivity"/>
+        <activity android:name=".DialogActivity"
+            android:theme="@android:style/Theme.Dialog" />
         <activity
             android:name=".SigninActivity"/>
         <activity
             android:name=".DoList"/>
-        <!--activity
-            android:name=".SigninActivity"
-            android:parentActivityName="com.example.anand.todolist.LoginActivity" >
-        <meta-data
-            android:name="android.support.PARENT_ACTIVITY"
-            android:value="com.example.anand.todolist.LoginActivity" />
-
-        </activity-->
-        <!--activity
-            android:name=".DoList"
-            android:parentActivityName="com.example.anand.todolist.SigninActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.anand.todolist.SigninActivity" />
-
-        </activity-->
+        
         <receiver android:name=".AlarmReceiver">
             <intent-filter>
                 <action android:name="android.media.AUDIO_BECOMING_NOISY"/>

@@ -1,5 +1,7 @@
 package com.example.anand.todolist;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 
 import android.net.Uri;
@@ -33,9 +35,7 @@ public class SigninActivity extends AppCompatActivity implements View.OnClickLis
         ConnectionCallbacks, OnConnectionFailedListener {
     private static final int RC_SIGN_IN = 9001;
     Uri a;
-
     private static final String TAG = "SignInActivity";
-
     // Google client to interact with Google API
     private GoogleApiClient mGoogleApiClient;
     private TextView mStatusTextView,mview;
@@ -62,6 +62,28 @@ public class SigninActivity extends AppCompatActivity implements View.OnClickLis
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
         signIn();
+
+    }
+
+    @Override
+    public void onBackPressed()
+    {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(SigninActivity.this);
+        builder.setCancelable(true);
+        builder.setTitle("Permission");
+        builder.setMessage("Sure to exit?");
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                finish();
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+
+            }
+        });
+        builder.show();
 
     }
 
@@ -136,6 +158,9 @@ public class SigninActivity extends AppCompatActivity implements View.OnClickLis
                     }
                 });
         Toast.makeText(this, "Successfully Signed out!", Toast.LENGTH_SHORT).show();
+        Intent intent=new Intent(SigninActivity.this, LoginActivity.class);
+        startActivity(intent);
+        finish();
 
     }
 
@@ -196,6 +221,7 @@ public class SigninActivity extends AppCompatActivity implements View.OnClickLis
             findViewById(R.id.btn_continue).setVisibility(View.GONE);
             findViewById(R.id.btn_signin).setVisibility(View.GONE);
             findViewById(R.id.btn_signout).setVisibility(View.GONE);
+
         }
     }
 

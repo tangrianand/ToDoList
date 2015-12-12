@@ -58,6 +58,28 @@ public class LoginActivity extends Activity implements View.OnClickListener {
         bgoogle.setOnClickListener(this);
     }
 
+    @Override
+    public void onBackPressed()
+    {
+        //super.onBackPressed();
+        AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
+        builder.setCancelable(true);
+        builder.setTitle("Permission");
+        builder.setMessage("Sure to exit?");
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                finish();
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+
+            }
+        });
+        builder.show();
+
+    }
+
 
             public void onClick(View view) {
                 switch (view.getId()) {
