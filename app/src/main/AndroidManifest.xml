@@ -10,7 +10,7 @@
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
 
 
@@ -44,6 +44,8 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".RegisterActivity"/>
+        <activity
             android:name=".SigninActivity"/>
         <activity
             android:name=".DoList"/>
@@ -63,6 +65,15 @@
                 android:value="com.example.anand.todolist.SigninActivity" />
 
         </activity-->
+        <receiver android:name=".AlarmReceiver">
+            <intent-filter>
+                <action android:name="android.media.AUDIO_BECOMING_NOISY"/>
+            </intent-filter>
+        </receiver>
+        <service
+            android:name=".NotificationService"
+            android:enabled="true">
+        </service>
 
    </application>
 

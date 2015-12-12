@@ -1,7 +1,9 @@
 package com.example.anand.todolist;
+import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -34,7 +36,7 @@ public class DoList extends AppCompatActivity {
     TextView tvAddress,textView;
     private TimePicker timePicker1;
     private TextView time;
-    private Calendar calendar;
+    private Calendar calendar,Calendar_Object;
     private String format = "";
     private TextView dateView;
     private int year, month, day;
@@ -55,6 +57,7 @@ public class DoList extends AppCompatActivity {
         time = (TextView) findViewById(R.id.time);
         dateView = (TextView) findViewById(R.id.viewdate);
         calendar = Calendar.getInstance();
+        Calendar_Object = Calendar.getInstance();
         final  int hour = calendar.get(Calendar.HOUR_OF_DAY);
         final int min = calendar.get(Calendar.MINUTE);
         year = calendar.get(Calendar.YEAR);
@@ -133,7 +136,7 @@ public class DoList extends AppCompatActivity {
                     mGPS.getLocation();
                     textView.setText("Latitude: " + mGPS.getLatitude() + " " + "Longitude: " + mGPS.getLongitude());
                 }
-                
+
                 if (mGPS.isGPSEnabled && mGPS.isNetworkEnabled) {
                     Toast.makeText(DoList.this, "Waiting For GPS!", Toast.LENGTH_SHORT).show();
                 }
@@ -171,6 +174,16 @@ public class DoList extends AppCompatActivity {
 
     }
     public void showTime(int hour, int min) {
+        if(min>=15){
+        Calendar_Object.set(Calendar.HOUR_OF_DAY, hour);
+        Calendar_Object.set(Calendar.MINUTE, min-15);   //Considering person will put the time more than 15 minutes from the current time
+        Calendar_Object.set(Calendar.SECOND, 0);}
+        else if (min <15){
+            Calendar_Object.set(Calendar.HOUR_OF_DAY, hour-1);
+            Calendar_Object.set(Calendar.MINUTE, 60-15+min);
+            Calendar_Object.set(Calendar.SECOND, 0);}
+
+
         if (hour == 0) {
             hour += 12;
             format = "AM";
@@ -214,6 +227,9 @@ public class DoList extends AppCompatActivity {
     private void showDate(int year, int month, int day) {
         dateView.setText(new StringBuilder().append(day).append("/")
                 .append(month).append("/").append(year));
+        Calendar_Object.set(Calendar.MONTH, month-1);
+        Calendar_Object.set(Calendar.YEAR, year);
+        Calendar_Object.set(Calendar.DAY_OF_MONTH, day);
     }
 
 
@@ -320,6 +336,26 @@ public class DoList extends AppCompatActivity {
                         }
                     });
                     builder.show();
+                    Intent myIntent = new Intent(DoList.this, AlarmReceiver.class);
+                    myIntent.putExtra("remind",remind);
+                    myIntent.putExtra("location",location);
+
+
+                    PendingIntent pendingIntent = PendingIntent.getBroadcast(DoList.this,
+                            0, myIntent, 0);
+
+                    AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+
+		/*
+		 * The following sets the Alarm in the specific time by getting the long
+		 * value of the alarm date time which is in calendar object by calling
+		 * the getTimeInMillis(). Since Alarm supports only long value , we're
+		 * using this method.
+		 */
+
+                    alarmManager.set(AlarmManager.RTC, Calendar_Object.getTimeInMillis(),
+                            pendingIntent);
+
                 }
             }
             catch (final IllegalArgumentException e) {

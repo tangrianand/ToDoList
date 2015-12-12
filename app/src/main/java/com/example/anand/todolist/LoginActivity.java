@@ -34,13 +34,11 @@ public class LoginActivity extends Activity implements View.OnClickListener {
 
     private ProgressDialog pDialog;
     TextView user, pass;
-    Button blogin;
+    Button blogin,bregister;
     SignInButton bgoogle;
     JSONParser jParser = new JSONParser();
-   // private static String url = "http://localhost/android/login.php";
     private static final String TAG_SUCCESS = "success";
     private static final String TAG_MESSAGE = "message";
-
 
 
     @Override
@@ -49,75 +47,95 @@ public class LoginActivity extends Activity implements View.OnClickListener {
         setContentView(R.layout.loginactivity);
 
         blogin = (Button) findViewById(R.id.btn_login);
+        bregister = (Button) findViewById(R.id.btn_register);
         bgoogle = (SignInButton) findViewById(R.id.btn_google);
         user = (TextView) findViewById(R.id.input_email);
         pass = (TextView) findViewById(R.id.input_password);
         blogin.setBackgroundColor(Color.WHITE);
+        bregister.setBackgroundColor(Color.WHITE);
         blogin.setOnClickListener(this);
+        bregister.setOnClickListener(this);
         bgoogle.setOnClickListener(this);
     }
 
 
             public void onClick(View view) {
                 switch (view.getId()) {
-                    case R.id.btn_login:{
+
+                    case R.id.btn_login:
+
                         if(!haveNetworkConnection())
                         {
                             AlertDialog alertDialog = new AlertDialog.Builder(this).create();
-
                             alertDialog.setTitle("Info");
                             alertDialog.setMessage("Internet not available, Cross check your internet connectivity and try again");
                             alertDialog.setIcon(android.R.drawable.ic_dialog_alert);
-
                             alertDialog.setButton("OK", new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
-                                    System.exit(1);
+                                }
+                            });
+                            alertDialog.show();
+                        }
+                        else
+                        new AttemptLogin().execute();
+
+                        break;
+
+                    case R.id.btn_google:
+
+                        if(!haveNetworkConnection())
+                        {
+                            AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+                            alertDialog.setTitle("Info");
+                            alertDialog.setMessage("Internet not available, Cross check your internet connectivity and try again");
+                            alertDialog.setIcon(android.R.drawable.ic_dialog_alert);
+                            alertDialog.setButton("OK", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                }
+                            });
+                            alertDialog.show();
+                        }
+                        else
+                        {
+                        Log.d("google!", "starting");
+                        Intent i=new Intent(LoginActivity.this, SigninActivity.class);
+                        startActivity(i);
+                        finish();
+                        }
+                        break;
+
+                    case R.id.btn_register:
+
+                        if(!haveNetworkConnection())
+                        {
+                            AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+                            alertDialog.setTitle("Info");
+                            alertDialog.setMessage("Internet not available,\nCross check your internet connectivity and try again");
+                            alertDialog.setIcon(android.R.drawable.ic_dialog_alert);
+                            alertDialog.setButton("OK", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
                                 }
                             });
 
                             alertDialog.show();
                         }
                         else
-                        new AttemptLogin().execute();}
-
+                        {
+                            Intent i=new Intent(LoginActivity.this,RegisterActivity.class);
+                            startActivity(i);
+                            finish();
+                        }
                         break;
 
-                    case R.id.btn_google:{
-                        if(!haveNetworkConnection())
-                        {
-                            AlertDialog alertDialog = new AlertDialog.Builder(this).create();
-
-                            alertDialog.setTitle("Info");
-                            alertDialog.setMessage("Internet not available, Cross check your internet connectivity and try again");
-                            alertDialog.setIcon(android.R.drawable.ic_dialog_alert);
-
-                            alertDialog.setButton("OK", new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                    System.exit(1);
-                                }
-                            });
-
-                            alertDialog.show();
-                        }
-                        else{
-                        Log.d("google!", "starting");
-
-                       Intent i=new Intent(LoginActivity.this, SigninActivity.class);
-                        startActivity(i);
-                        finish();}
-                        break;}
                     default:
-                       break;
+                        break;
                 }
-
             }
 
   private boolean haveNetworkConnection() {
       boolean haveConnectedWifi = false;
       boolean haveConnectedMobile = false;
-
       ConnectivityManager cm = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
-
       NetworkInfo[] netInfo = cm.getAllNetworkInfo();
       for (NetworkInfo ni : netInfo) {
           if (ni.getTypeName().equalsIgnoreCase("WIFI"))
@@ -129,10 +147,6 @@ public class LoginActivity extends Activity implements View.OnClickListener {
       }
       return haveConnectedWifi || haveConnectedMobile;
   }
-
-
-
-
 
 
     class AttemptLogin extends AsyncTask<String, String, String> {
@@ -158,50 +172,29 @@ public class LoginActivity extends Activity implements View.OnClickListener {
                 List<NameValuePair> params = new ArrayList<NameValuePair>();
                 params.add(new BasicNameValuePair("username", username));
                 params.add(new BasicNameValuePair("password", password));
-
                 Log.d("request!", "starting");
-
                 JSONObject json = jParser.makeHttpRequest("http://c06d9af0.ngrok.io/android/login.php", "POST", params);
                 Log.d("Login attempt", json.toString());
-
-
                 success = json.optInt(TAG_SUCCESS);
-
-
 
                     if (success == 1) {
                         Log.d("Successful Login", json.toString());
                         return json.getString(TAG_MESSAGE);
-
-
-
-                    } else {
+                    }
+                    else {
                         Log.d("unSuccessful Login", json.toString());
                         return json.getString(TAG_MESSAGE);
-
                     }
-
-
             }
             catch(JSONException e){
                 e.printStackTrace();
-                Toast.makeText(LoginActivity.this, "ngrok is not online", Toast.LENGTH_LONG).show();
-
             }
-
-
-
             return null;
-
         }
 
         protected void onPostExecute(String message){
             try {
-
-
                 pDialog.dismiss();
-
-
                 if (message != null) {
                     Toast.makeText(LoginActivity.this, message, Toast.LENGTH_LONG).show();
                 }
@@ -212,9 +205,10 @@ public class LoginActivity extends Activity implements View.OnClickListener {
                 }
             }
             catch (final IllegalArgumentException e) {
-                // Handle or log or ignore
-            } catch (final Exception e) {
-                // Handle or log or ignore
+                e.printStackTrace();
+            }
+            catch (final Exception e) {
+                e.printStackTrace();
             }
         }
     }
