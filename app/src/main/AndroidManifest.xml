@@ -51,7 +51,7 @@
             android:name=".SigninActivity"/>
         <activity
             android:name=".DoList"/>
-        
+
         <receiver android:name=".AlarmReceiver">
             <intent-filter>
                 <action android:name="android.media.AUDIO_BECOMING_NOISY"/>

@@ -195,7 +195,7 @@ public class LoginActivity extends Activity implements View.OnClickListener {
                 params.add(new BasicNameValuePair("username", username));
                 params.add(new BasicNameValuePair("password", password));
                 Log.d("request!", "starting");
-                JSONObject json = jParser.makeHttpRequest("http://c06d9af0.ngrok.io/android/login.php", "POST", params);
+                JSONObject json = jParser.makeHttpRequest("http://ec2fb769.ngrok.io/android/login.php", "POST", params);
                 Log.d("Login attempt", json.toString());
                 success = json.optInt(TAG_SUCCESS);
 
@@ -222,6 +222,9 @@ public class LoginActivity extends Activity implements View.OnClickListener {
                 }
                 if(message.equals("Successful login")) {
                     Intent intent = new Intent(LoginActivity.this, DoList.class);
+                    intent.putExtra("username",username);
+
+
                     startActivity(intent);
                     finish();
                 }

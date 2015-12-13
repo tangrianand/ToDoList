@@ -99,7 +99,7 @@ public class RegisterActivity extends Activity implements View.OnClickListener {
 
                 Log.d("request!", "starting");
 
-                JSONObject json = jParser.makeHttpRequest("http://c06d9af0.ngrok.io/android/register.php", "POST", params);
+                JSONObject json = jParser.makeHttpRequest("http://ec2fb769.ngrok.io/android/register.php", "POST", params);
                 Log.d("Register attempt", json.toString());
 
                 success = json.optInt(TAG_SUCCESS);

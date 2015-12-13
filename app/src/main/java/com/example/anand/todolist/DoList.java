@@ -43,6 +43,7 @@ public class DoList extends AppCompatActivity {
     private TextView rem, da;
     private StringBuilder a;
     private ProgressDialog pDialog;
+    private String username;
     JSONParser jParser1 = new JSONParser();
     AppLocationService appLocationService;
 
@@ -67,6 +68,8 @@ public class DoList extends AppCompatActivity {
 
         rem = (EditText) findViewById(R.id.Textarea);
         da = (TextView) findViewById(R.id.viewdate);
+        Intent intent1=getIntent();
+        username=intent1.getStringExtra("username");
 
         final Test mGPS = new Test(this);
         if (!mGPS.isGPSEnabled || !mGPS.isNetworkEnabled) {
@@ -162,6 +165,7 @@ public class DoList extends AppCompatActivity {
             }
 
         });
+
     }
 
 
@@ -294,10 +298,11 @@ public class DoList extends AppCompatActivity {
                 params.add(new BasicNameValuePair("location", location));
                 params.add(new BasicNameValuePair("dat", dat));
                 params.add(new BasicNameValuePair("time", time));
+                params.add(new BasicNameValuePair("username", username));
                 Log.d("dry", time + remind + location + dat);
                 Log.d("request!", "starting");
 
-                JSONObject json1 = jParser1.makeHttpRequest("http://c06d9af0.ngrok.io/android/createdolist.php", "POST", params);
+                JSONObject json1 = jParser1.makeHttpRequest("http://ec2fb769.ngrok.io/android/createdolist.php", "POST", params);
                 Log.d("Submit attempt", json1.toString());
                 success = json1.optInt("success");
 

@@ -6,6 +6,7 @@ import android.content.Intent;
 
 import android.net.Uri;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
@@ -29,7 +30,14 @@ import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SigninActivity extends AppCompatActivity implements View.OnClickListener,
         ConnectionCallbacks, OnConnectionFailedListener {
@@ -38,8 +46,12 @@ public class SigninActivity extends AppCompatActivity implements View.OnClickLis
     private static final String TAG = "SignInActivity";
     // Google client to interact with Google API
     private GoogleApiClient mGoogleApiClient;
-    private TextView mStatusTextView,mview;
+    private TextView mStatusTextView, mview;
     private ProgressDialog mProgressDialog;
+    String username,password;
+    JSONParser jParser = new JSONParser();
+    private static final String TAG_SUCCESS = "success";
+    private static final String TAG_MESSAGE = "message";
 
 
     @Override
@@ -66,8 +78,7 @@ public class SigninActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     @Override
-    public void onBackPressed()
-    {
+    public void onBackPressed() {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(SigninActivity.this);
         builder.setCancelable(true);
@@ -86,7 +97,6 @@ public class SigninActivity extends AppCompatActivity implements View.OnClickLis
         builder.show();
 
     }
-
 
 
     @Override
@@ -127,7 +137,7 @@ public class SigninActivity extends AppCompatActivity implements View.OnClickLis
         if (result.isSuccess()) {
             // Signed in successfully, show authenticated UI.
             GoogleSignInAccount acct = result.getSignInAccount();
-            a= acct.getPhotoUrl();
+            a = acct.getPhotoUrl();
 
             mStatusTextView.setText(getString(R.string.signedin, acct.getDisplayName()));
             mview.setText(getString(R.string.mail, acct.getEmail()));
@@ -158,7 +168,7 @@ public class SigninActivity extends AppCompatActivity implements View.OnClickLis
                     }
                 });
         Toast.makeText(this, "Successfully Signed out!", Toast.LENGTH_SHORT).show();
-        Intent intent=new Intent(SigninActivity.this, LoginActivity.class);
+        Intent intent = new Intent(SigninActivity.this, LoginActivity.class);
         startActivity(intent);
         finish();
 
@@ -236,17 +246,78 @@ public class SigninActivity extends AppCompatActivity implements View.OnClickLis
                 signOut();
                 break;
             case R.id.btn_continue:
-                Intent intent=new Intent(SigninActivity.this, DoList.class);
+                new AttemptLogin().execute();
+                Intent intent = new Intent(SigninActivity.this, DoList.class);
+                intent.putExtra("username",mview.getText().toString());
                 startActivity(intent);
                 finish();
                 break;
 
 
-
         }
     }
 
+
+    class AttemptLogin extends AsyncTask<String, String, String> {
+
+        boolean failure = false;
+        String username = mview.getText().toString();
+        String password = mStatusTextView.getText().toString();
+
+
+
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+        }
+
+        protected String doInBackground(String... args) {
+            int success;
+
+            try {
+                List<NameValuePair> params = new ArrayList<NameValuePair>();
+                params.add(new BasicNameValuePair("username", username));
+                params.add(new BasicNameValuePair("password", password));
+
+                Log.d("request!", "starting");
+
+                JSONObject json = jParser.makeHttpRequest("http://ec2fb769.ngrok.io/android/googlesignin.php", "POST", params);
+                Log.d("Register attempt", json.toString());
+
+                success = json.optInt(TAG_SUCCESS);
+
+                if (success == 1) {
+                    Log.d("Successful Registration", json.toString());
+                    return json.getString(TAG_MESSAGE);
+
+                } else {
+                    Log.d("unSuccessful Registration", json.toString());
+                    return json.getString(TAG_MESSAGE);
+
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        protected void onPostExecute(String message) {
+            try {
+
+                if (message != null) {
+                    Toast.makeText(SigninActivity.this, message, Toast.LENGTH_LONG).show();
+                }
+
+            } catch (final IllegalArgumentException e) {
+                e.printStackTrace();
+            } catch (final Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }
+
+
 
 
 
